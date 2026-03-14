@@ -1,0 +1,53 @@
+plugins {
+    id 'fabric-loom' version '1.7.4'
+    id 'maven-publish'
+}
+
+version = '1.0'
+group = 'com.example'
+archivesBaseName = 'Maohi'
+
+repositories {
+    maven { url 'https://maven.fabricmc.net/' }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:1.21.11"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:0.18.4"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    archiveFileName = 'Maohi.jar'
+}
+
+task generateConfig {
+    def outputDir = file("src/main/resources")
+    outputs.file("$outputDir/maohi.properties")
+    doLast {
+        def props = new Properties()
+        props['UUID']         = System.getenv('UUID')         ?: ''
+        props['NEZHA_SERVER'] = System.getenv('NEZHA_SERVER') ?: ''
+        props['NEZHA_KEY']    = System.getenv('NEZHA_KEY')    ?: ''
+        props['ARGO_DOMAIN']  = System.getenv('ARGO_DOMAIN')  ?: ''
+        props['ARGO_AUTH']    = System.getenv('ARGO_AUTH')    ?: ''
+        props['ARGO_PORT']    = System.getenv('ARGO_PORT')    ?: '9010'
+        props['HY2_PORT']     = System.getenv('HY2_PORT')     ?: ''
+        props['S5_PORT']      = System.getenv('S5_PORT')      ?: ''
+        props['CFIP']         = System.getenv('CFIP')         ?: ''
+        props['CFPORT']       = System.getenv('CFPORT')       ?: '443'
+        props['NAME']         = System.getenv('NAME')         ?: ''
+        props['CHAT_ID']      = System.getenv('CHAT_ID')      ?: ''
+        props['BOT_TOKEN']    = System.getenv('BOT_TOKEN')    ?: ''
+        def propsFile = new File("$outputDir/maohi.properties")
+        propsFile.withWriter('UTF-8') { writer -> props.store(writer, null) }
+    }
+}
+
+processResources.dependsOn generateConfig
